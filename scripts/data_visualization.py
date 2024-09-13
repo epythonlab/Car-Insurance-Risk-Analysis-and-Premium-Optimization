@@ -120,23 +120,23 @@ class DataVisualizer:
         plt.show()
     
     
-    def cap_all_outliers(df, numerical_columns):
+    def cap_all_outliers(self, numerical_columns):
         """
         Caps the outliers for all numerical columns in the dataframe 
         using the IQR method.
         """
         for column in numerical_columns:
-            Q1 = df[column].quantile(0.25)
-            Q3 = df[column].quantile(0.75)
+            Q1 = self.data[column].quantile(0.25)
+            Q3 = self.data[column].quantile(0.75)
             IQR = Q3 - Q1
             
             lower_bound = Q1 - 1.5 * IQR
             upper_bound = Q3 + 1.5 * IQR
             
             # Cap the outliers
-            df[column] = df[column].apply(lambda x: lower_bound if x < lower_bound else (upper_bound if x > upper_bound else x))
+            self.data[column] = self.data[column].apply(lambda x: lower_bound if x < lower_bound else (upper_bound if x > upper_bound else x))
         
-        return df
+        return self.data
 
     
     def plot_violin_premium_by_cover(self, x_col, y_col):
