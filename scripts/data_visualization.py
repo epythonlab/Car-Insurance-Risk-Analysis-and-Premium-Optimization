@@ -83,23 +83,48 @@ class DataVisualizer:
         plt.show()
         
     
-    def plot_trends_by_geography(self):
-        """
-        Plots a grouped bar plot comparing insurance cover types, premium, and auto make over different regions (PostalCode).
-        """
-        plt.figure(figsize=(12, 5))
-        
-        # Aggregating data by PostalCode
-        agg_data = self.data.groupby('PostalCode')[['TotalPremium', 'SumInsured']].mean().reset_index()
-        
-        # Plotting
-        sns.barplot(x='PostalCode', y='TotalPremium', data=agg_data, palette='Set3')
-        plt.title('Average TotalPremium by PostalCode')
-        plt.xlabel('PostalCode')
-        plt.ylabel('Average TotalPremium')
-        plt.xticks(rotation=45)
+    def plot_geographical_trends(self, cover_types):
+        # Set up the figure with 2 rows and 2 columns for combined visualizations
+        fig, axs = plt.subplots(2, 2, figsize=(16, 12))
+
+        # Filter the data to include only these cover types
+        filtered_data = self.data[self.data['CoverType'].isin(cover_types)]
+
+        # 1. Cover Type Distribution by Province (bar plot)
+        sns.countplot(x='Province', hue='CoverType', data=filtered_data, palette='Set3', ax=axs[0, 0])
+        axs[0, 0].set_title('Distribution of Common Cover Types Across Provinces')
+        axs[0, 0].set_xlabel('Province')
+        axs[0, 0].set_ylabel('Count')
+        axs[0, 0].tick_params(axis='x', rotation=45)
+        axs[0, 0].legend(title='Cover Type', loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2)
+
+        # 2. Car Make Distribution by Province (bar plot)
+        car_make_counts = self.data.groupby('Province')['make'].count().reset_index()
+        sns.barplot(x='Province', y='make', data=car_make_counts, ax=axs[0, 1])
+        axs[0, 1].set_title('Car Make Distribution by Province')
+        axs[0, 1].set_xlabel('Province')
+        axs[0, 1].set_ylabel('Count of Car Makes')
+        axs[0, 1].tick_params(axis='x', rotation=45)
+
+        # 3. Total Premium by Province (box plot)
+        sns.boxplot(x='Province', y='TotalPremium', data=self.data, showmeans=True, ax=axs[1, 0])
+        axs[1, 0].set_title('Distribution of Total Premium by Province')
+        axs[1, 0].set_xlabel('Province')
+        axs[1, 0].set_ylabel('Total Premium')
+        axs[1, 0].tick_params(axis='x', rotation=45)
+
+        # 4. Vehicle Type Distribution by Province (count plot)
+        sns.countplot(x='Province', hue='VehicleType', data=self.data, palette='Set1', ax=axs[1, 1])
+        axs[1, 1].set_title('Vehicle Type Distribution by Province')
+        axs[1, 1].set_xlabel('Province')
+        axs[1, 1].set_ylabel('Count of Vehicle Types')
+        axs[1, 1].tick_params(axis='x', rotation=45)
+        axs[1, 1].legend(title='Vehicle Type', loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2)
+
+        # Adjust layout to prevent overlapping
         plt.tight_layout()
         plt.show()
+
 
 
     def plot_outliers_boxplot(self, cols):
