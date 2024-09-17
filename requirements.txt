@@ -4,3 +4,6 @@ seaborn
 pandas
 numpy
 scipy
+xgboost
+shap
+lime
